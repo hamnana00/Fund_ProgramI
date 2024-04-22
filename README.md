@@ -41,3 +41,5 @@ b. Las victorias darán 3 puntos, empates 1 y derrotas 0.
 5. Finalizar competición.
 a. Se guardarán en un fichero “jornadas.txt” los resultados de las jornadas y en 
 otro fichero “resultado_liga.txt” la clasificación final de la liga.
+# Nota: 7/10
+Documentación: https://drive.google.com/drive/folders/1XVGiSvyntZfcMxMoQCVv_e_aNiP5EhRi?usp=drive_link
