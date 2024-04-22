@@ -1,0 +1,128 @@
+package jaraJahuira;
+//Dacil Naomi Jara Jahuira
+//NIE: Y3797977R
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.util.Arrays;
+import java.util.Scanner;
+import java.io.*;
+public class SistLiga {
+	//CAMBIOS LUEGO DE GRABAR EL VIDEO:
+	/*Se ha decidico quitar las variable globales para crearlas dentro el main y así poderlas implementar
+	 * correctamentee con los métodos recursivos.
+	 * También se ha quitado el try-catch para reemplazarlo por la declaración throws de IOException y
+	 * FileNotFoundException.
+	 * En la clase prueba 2 se encuentra el código original sin estos cambios, sin embargo, preferiría que
+	 * solamente esta clase fuera corregida.
+	 */
+
+	public static void main(String[] args) throws IOException{
+		Scanner leer = new Scanner(System.in);
+		String[]equipos;
+		int nequipos;
+		System.out.println("Ingresa el número de equipos que serán parte de la liga:");
+		nequipos = leer.nextInt();
+		equipos = new String[nequipos];
+		int[]puntos = new int[nequipos];
+
+		for (int i = 0; i < equipos.length; i++) {
+			System.out.println("Ingrese nombre para el equipo " + (i + 1) + ": ");
+			equipos[i] = leer.next();
+		}
+		String[][] resultados = null;
+		calendario(equipos,resultados);
+		resultados(equipos, leer,resultados,puntos);
+		clasificacion(equipos,puntos);
+		impresionFichero(equipos,resultados,puntos);
+
+	}
+
+	public static void calendario(String[] equipos,String[][] resultados) {
+		int numeroEquipos = equipos.length;
+		boolean equiposImpares = numeroEquipos % 2 != 0;
+
+		if (equiposImpares) {
+			equipos = Arrays.copyOf(equipos, equipos.length + 1);
+			equipos[equipos.length - 1] = "Descansa"; // Agrego equipo
+		}
+
+		int jornadas = equipos.length - 1;
+		int partidos = equipos.length / 2;
+
+		for (int i = 0; i < jornadas; i++) {
+			System.out.println("Jornada " + (i + 1) + ":");
+			for (int j = 0; j < partidos; j++) {
+				int primerEquipo = (i + j) % (equipos.length - 1);
+				int segundoEquipo = (equipos.length - 1 - j + i) % (equipos.length - 1);
+				// ajustar indices para que quepan 
+				if (j == 0 && i % 2 != 0) {
+					segundoEquipo = equipos.length - 1;
+				}
+				System.out.println(equipos[primerEquipo] + " - " + equipos[segundoEquipo]);
+			}
+			System.out.println();
+		}
+		if (equiposImpares) {
+			equipos = Arrays.copyOf(equipos, equipos.length - 1); // remover el equipo ficticio
+		}
+		if (equiposImpares) {
+			resultados = new String[jornadas][partidos + 1];
+		} else {
+			resultados = new String[jornadas][partidos];
+		}
+	}
+
+	public static void resultados(String[] equipos, Scanner leer,String[][] resultados, int[]puntos) {
+		System.out.println("-------------------------");
+		System.out.println("Seguir formato de resultados: equipo1 - equipos2");
+		System.out.println("-------------------------");
+		for (int i = 0; i < resultados.length; i++) {
+			System.out.println("Introduzca los resultados de la jornada " + (i + 1) + ": ");
+			for (int j = 0; j < resultados[i].length; j++) {
+				System.out.println("Resultado para el partido " + equipos[j] + ": ");
+				resultados[i][j] = leer.next();
+				String[] goles = resultados[i][j].split("-");
+
+				int golesEquipo1 = Integer.parseInt(goles[0]);
+				int golesEquipo2 = Integer.parseInt(goles[1]);
+				//con parseInt permitimos que una cadena String se pueda volver una variable entera
+
+				if (golesEquipo1 > golesEquipo2) { // Si gana equipo 1, sumar 3 puntos a su puntaje
+					puntos[j] += 3;
+				} else if (golesEquipo1 < golesEquipo2) { // si gana equipo 2
+					puntos[(j + 1) % equipos.length] += 3;
+				} else { // Si hay empate
+					puntos[j] += 1;
+					puntos[(j + 1) % equipos.length] += 1;
+				}
+			}
+		}
+	}
+
+	public static void clasificacion(String[] equipos, int [] puntos) {
+		for (int i = 0; i < equipos.length; i++) {
+			System.out.println("Equipo: " + equipos[i] + " Puntos: " + puntos[i]);
+		}
+	}
+
+	public static void impresionFichero (String []equipos,String[][] resultados, int [] puntos) throws FileNotFoundException {
+
+			PrintWriter jornadasWriter = new PrintWriter("jornadas.txt");
+			for (int i = 0; i < resultados.length; i++) {
+				jornadasWriter.println("Jornada " + (i + 1) + ": ");
+				for (int j = 0; j < resultados[i].length; j++) {
+					jornadasWriter.println(equipos[j] + " - " + resultados[i][j]);
+				}
+				jornadasWriter.println();
+			}
+			jornadasWriter.close();
+
+			PrintWriter resultadosWriter = new PrintWriter("resultado_liga.txt");
+			for (int i = 0; i < equipos.length; i++) {
+				resultadosWriter.println("Equipo: " + equipos[i] + " Puntos: " + puntos[i]);
+			}
+			resultadosWriter.close();
+	}
+
+}
